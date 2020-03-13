@@ -9,7 +9,7 @@ $ yarn start
 
 # Start mongo
 
-  - If on pc
+  - If on your computer
 
 ```sh 
 $ mongod 
