@@ -12,16 +12,7 @@ router.get(
   userController.getUser
 );
 
-router.get(
-  "/students/:subjectParam",
-  userController.allowIfLoggedin,
-  userController.getStudentswithSubject
-);
 
-router.get(
-  "/getClasses",
-  userController.getClasses
-);
 router.get(
   "/users",
   userController.allowIfLoggedin,
@@ -35,21 +26,17 @@ router.get(
   userController.grantAccess("readAny", "profile"),
   userController.getStudents
 );
-
-router.put(
-  "/user/:userId",
-  userController.allowIfLoggedin,
-  userController.grantAccess("updateAny", "profile"),
-  userController.updateUser
-);
-//attandance coomence
 router.get(
-  "/attendance/",
-  //userController.allowIfLoggedin,
- // userController.grantAccess("updateAny", "profile"),
-  //userController.getClasses,
-  userController.AttendanceCommence
+  "/students/:subjectParam",
+  userController.allowIfLoggedin,
+  userController.getStudentswithSubject
 );
+
+router.get(
+  "/getClasses/:subjectParam",
+  userController.getClasses
+);
+
 //student checking his attandance
 router.get(
   "/stuAtt/",
@@ -58,11 +45,28 @@ router.get(
   //userController.getClasses,
   userController.getStudentsAttandanceStatus
 );
+
+//attandance coomence
+router.post(
+  "/attendance/",
+  userController.allowIfLoggedin, 
+ userController.grantAccess("updateAny", "profile"),
+  //userController.getClasses,
+  userController.AttendanceCommence
+);
+
+router.put(
+  "/user/:userId",
+  userController.allowIfLoggedin,
+  userController.grantAccess("updateAny", "profile"),
+  userController.updateUser
+);
 router.delete(
   "/user/:userId",
   userController.allowIfLoggedin,
   userController.grantAccess("deleteAny", "profile"),
   userController.deleteUser
 );
+
 
 module.exports = router;

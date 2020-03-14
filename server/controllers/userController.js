@@ -118,18 +118,20 @@ exports.getStudentsAttandanceStatus = async (req, res, next) => {
   });
 };
 
-// professor with his student who have same subject by default chemistry is passed
+// professor with his student who have same subject which passed in through url
 exports.getClasses = async (req, res, next) => {
   const subjectParam = req.params.subject;
+  //from teacher table find the teacher with the subject and students from student table and show the students as professor class
   const profeclass =  await TeacherUser.aggregate([{
-    $match : { "subject" : "chem" }},{ "$project": {"role":1,"email":1,"subject":1,"userType":1}},{$lookup:{from:"users",  pipeline: [
-      { $match: { "subject": "chem", "role": "student"}},
+    $match : { "subject" : subjectParam }},{ "$project": {"role":1,"email":1,"subject":1,"userType":1}},{$lookup:{from:"users",  pipeline: [
+      { $match: { "subject": subjectParam, "role": "student"}},
       { "$project": {"role":1,"email":1,"subject":1,"userType":1,"attendance_status":1}}
     ],
           
            as: "professorclass"}}]);
-           var cdate = new Date().toLocaleString('default', { dateStyle: 'medium', timeStyle: 'short' });
 
+           var cdate = new Date().toLocaleString('default', { dateStyle: 'medium', timeStyle: 'short' });
+           // Make a class/attendance entery of student with the subject teacher
            const attand = new Attendance({
             role:profeclass[0].role,
             userType:profeclass[0].userType,
@@ -146,17 +148,20 @@ exports.getClasses = async (req, res, next) => {
   
 };
 
-//add the class(students+teacher) in attendance schema
+//start taking attendance only for those students whose email and subject were passed
 
 exports.AttendanceCommence = async (req, res, next) => {
   try {
-    const { email, subject} = req.body
+   // const { email, subject} = req.body
+    //dummy data 
     var someData = [
       {email: "student2@gmail.com", subject: "chem"},
       {email: "student1@gmail.com", subject: "chem"},
    ];
-   var sub=someData[0].subject;
-   console.log(sub);
+   var sub=someData[0].subject; //get the subject
+
+  // console.log(sub);
+  //get all the emails from the array of objects
    function listEmails(email) {
     let product_names = [];
     for (let i=0; i<email.length; i+=1) {
@@ -165,12 +170,14 @@ exports.AttendanceCommence = async (req, res, next) => {
     }
     return product_names;
   }
-  //console.log(listEmails(someData));
 
+  //console.log(listEmails(someData));
+  //get all student with the subject pass
   const Allstudentsaag =  await Attendance.aggregate(
     [ { $match : { "subject" : sub  } } ,
     { $project : { _id: 0,email:1, professorclass : 1  ,
-       numberofstudent: { $cond: { if: { $isArray: "$professorclass" }, then: { $size: "$professorclass" }, else: "NA"} }}},]);//get all user from db
+       numberofstudent: { $cond: { if: { $isArray: "$professorclass" }, then: { $size: "$professorclass" }, else: "NA"} }}},]);
+       
     
 
    //update those student whose email & subject was passed 
@@ -178,19 +185,19 @@ exports.AttendanceCommence = async (req, res, next) => {
    const files = await listEmails(someData);
     
 
-   await Promise.all(files.map(async (file) => {
-     
+   await Promise.all(files.map(async (emailofstudent) => {
+     //set the student attendance as Present if subject and email was passed in the attendance table
     const updatestatus=await Attendance.update(
       { },
-      { $set: { "professorclass.$[elem].attendance_status" :  "SES" } },
+      { $set: { "professorclass.$[elem].attendance_status" :  "P" } },
       {
         multi: true,
-        arrayFilters: [ { "elem.role": { $eq: "student" }, "elem.subject": { $eq: sub}, "elem.email": { $eq: file}} ], multi: true
+        arrayFilters: [ { "elem.role": { $eq: "student" }, "elem.subject": { $eq: sub}, "elem.email": { $eq: emailofstudent}} ], multi: true
       }
    );
 
-   console.log(updatestatus);
-   console.log(file);
+  console.log(updatestatus);
+   //console.log(file);
   }));
     
 
