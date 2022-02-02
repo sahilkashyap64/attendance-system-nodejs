@@ -30,10 +30,10 @@ mongoose
 # Attendance API w/ Express.js and MongoDB
 
 A backend application using Node.js with the Express framework, that implements a simple CRUD with the MongoDB.
-●Build an attendance application where a student and teacher can log in and sign up.
+- Build an attendance application where a student and teacher can log in and sign up.
 NOTE: store password hashed
-● Where teachers can take attendance of the students in their class.
-● Students can only see the current status of their attendance.
+-  Where teachers can take attendance of the students in their class.
+-  Students can only see the current status of their attendance.
 
 ---
 
